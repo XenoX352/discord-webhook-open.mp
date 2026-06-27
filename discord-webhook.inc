@@ -44,8 +44,8 @@
 
 #include <requests>
 
-forward OnDiscordEmbedResponse(Request:id, E_HTTP_STATUS:status, Node:node);
-public OnDiscordEmbedResponse(Request:id, E_HTTP_STATUS:status, Node:node)
+forward OnDiscordEmbedResponse(Request:id, E_HTTP_STATUS:status, data[], dataLen);
+public OnDiscordEmbedResponse(Request:id, E_HTTP_STATUS:status, data[], dataLen)
 {
     // if (node != Node:-1)
     //     JsonCleanup(node);
@@ -103,7 +103,7 @@ stock SendDiscordEmbed(
             new split = strfind(line, "|", true);
             if (split != -1)
             {
-                strmid(name,  line, 0,       split);
+                strmid(name,  line, 0, split);
                 strmid(value, line, split + 1, strlen(line));
 
                 new Node:field = JsonObject(
@@ -127,6 +127,20 @@ stock SendDiscordEmbed(
     }
     new Node:root = JsonObject();
     JsonSetObject(root, "embeds", JsonArray(embed));
+
+    if (strlen(bot_name) > 0)
+    {
+        new tmpBotName[64];
+        strcat(tmpBotName, bot_name);
+        JsonSetString(root, "username", tmpBotName);
+    }
+
+    if (strlen(bot_avatar) > 0)
+    {
+        new tmpAvatar[256];
+        strcat(tmpAvatar, bot_avatar);
+        JsonSetString(root, "avatar_url", tmpAvatar);
+    }
 
     new payload[2048];
     JsonStringify(root, payload, sizeof(payload));
