@@ -33,15 +33,13 @@ A lightweight SA:MP (San Andreas Multiplayer) include to send rich embed message
 
 ---
 
----
-
 ## Installation for Open.MP
 
 1. Download the latest release of **Pawn Requests** from [here](https://github.com/Southclaws/pawn-requests/releases).
 2. Put `requests.dll` (Windows) or `requests.so` (Linux) into your server's `components/` folder.
 3. Put `requests.inc` into your `qawno/include/` folder.
 4. Add `requests` to the `legacy_plugins` line in your `config.json`.
-5. Copy `discord-webhook.inc` into your `qawwno/include/` folder.
+5. Copy `discord-webhook.inc` into your `qawno/include/` folder.
 
 ---
 
