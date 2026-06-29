@@ -1,7 +1,6 @@
 /*
     Discord Webhook Include for SA:MP (San Andreas Multiplayer)
     Version: 1.0.0
-    Author: xenox
     License: MIT
     
     This include provides an easy-to-use function `SendDiscordEmbed()`
