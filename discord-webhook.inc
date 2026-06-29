@@ -44,11 +44,11 @@
 
 #include <requests>
 
-forward OnDiscordEmbedResponse(Request:id, E_HTTP_STATUS:status, Node:node);
-public OnDiscordEmbedResponse(Request:id, E_HTTP_STATUS:status, Node:node)
+forward OnDiscordEmbedResponse(Request:id, E_HTTP_STATUS:status, data[], dataLen);
+public OnDiscordEmbedResponse(Request:id, E_HTTP_STATUS:status, data[], dataLen)
 {
-    if (node != Node:-1)
-        JsonCleanup(node);
+    // if (node != Node:-1)
+    //     JsonCleanup(node);
 }
 
 stock SendDiscordEmbed(
@@ -86,11 +86,13 @@ stock SendDiscordEmbed(
     if (strlen(fields) > 0)
     {
         new Node:fieldsArray = JsonArray();
-        new buf[256], name[128], value[128], idx;
+        new buf[512], name[128], value[128];
+        new idx = 0;
         strcat(buf, fields);
+
         while (idx < strlen(buf))
         {
-            new line[128], pos;
+            new line[256], pos;
             pos = strfind(buf, "\n", true, idx);
             if (pos == -1)
                 strmid(line, buf, idx, strlen(buf));
@@ -101,7 +103,7 @@ stock SendDiscordEmbed(
             new split = strfind(line, "|", true);
             if (split != -1)
             {
-                strmid(name, line, 0, split);
+                strmid(name,  line, 0, split);
                 strmid(value, line, split + 1, strlen(line));
 
                 new Node:field = JsonObject(
@@ -123,19 +125,26 @@ stock SendDiscordEmbed(
         JsonSetString(footerObj, "text", tmpFooter);
         JsonSetObject(embed, "footer", footerObj);
     }
-
     new Node:root = JsonObject();
-
-    new tmpBotName[64];
-    strcat(tmpBotName, bot_name);
-    JsonSetString(root, "username", tmpBotName);
-
-    new tmpAvatar[256];
-    strcat(tmpAvatar, bot_avatar);
-    JsonSetString(root, "avatar_url", tmpAvatar);
-
     JsonSetObject(root, "embeds", JsonArray(embed));
 
-    RequestJSON(client, "", HTTP_METHOD_POST, "OnDiscordEmbedResponse", root);
+    if (strlen(bot_name) > 0)
+    {
+        new tmpBotName[64];
+        strcat(tmpBotName, bot_name);
+        JsonSetString(root, "username", tmpBotName);
+    }
+
+    if (strlen(bot_avatar) > 0)
+    {
+        new tmpAvatar[256];
+        strcat(tmpAvatar, bot_avatar);
+        JsonSetString(root, "avatar_url", tmpAvatar);
+    }
+
+    new payload[2048];
+    JsonStringify(root, payload, sizeof(payload));
     JsonCleanup(root);
+
+    Request(client, "", HTTP_METHOD_POST, "OnDiscordEmbedResponse", payload, RequestHeaders("Content-Type", "application/json"));
 }
